@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 16,
     fontWeight: "600",
-    textTransform: "capitalize",
+    textTransform: "uppercase",
   },
   userIdContainer: {
     position: "absolute",

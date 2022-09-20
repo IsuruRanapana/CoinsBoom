@@ -1,10 +1,8 @@
 import { API_KEY, BASE_URL } from "../config";
 
 const get = async ({ endpoint }) => {
-  var myHeaders = new Headers();
-  myHeaders.append("X-CoinAPI-Key", { API_KEY });
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    const response = await fetch(`${BASE_URL}${endpoint}?apikey=${API_KEY}`, {
       method: "GET",
       redirect: "follow",
     });

@@ -14,6 +14,38 @@ import { get } from "../../api/baseAPI";
 import { coinAssets } from "../../mock/coinAssets";
 import { coinIcons } from "../../mock/coinIcons";
 
+const PopUpModalCard = ({ item, image, children }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleClose = () => {
+    setModalVisible(!modalVisible);
+  };
+  return (
+    <View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            {children}
+            <Button labelText={"Close"} onPress={handleClose} />
+          </View>
+        </View>
+      </Modal>
+      <Pressable onPress={() => setModalVisible(true)}>
+        <ItemCard
+          title={item?.name}
+          assetId={item?.asset_id}
+          image={image?.url}
+        />
+      </Pressable>
+    </View>
+  );
+};
+
 export default function Home({ navigation }) {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -25,7 +57,6 @@ export default function Home({ navigation }) {
 
   const [listData, setListData] = useState([]);
   const [listOfIconData, setListOfIconData] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
 
   const handleLoadCoins = async () => {
     const data = await get({ endpoint: "v1/assets" });
@@ -38,44 +69,27 @@ export default function Home({ navigation }) {
     navigation.pop();
   };
 
-  const handleClose = () => {
-    setModalVisible(!modalVisible);
+  const getPrice = (val) => {
+    let tempVal = val.toFixed(4);
+    return tempVal;
   };
 
   const renderItem = ({ item, index }) => {
-    console.log(item);
-    const image = listOfIconData.filter(
-      (img) => img.asset_id === item?.asset_id
-    )[0];
+    let image = {};
+    if (listOfIconData) {
+      image = listOfIconData.filter(
+        (img) => img.asset_id === item?.asset_id
+      )[0];
+    }
     return (
-      <View>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>{item?.name}</Text>
-              <Text
-                style={styles.modalText}
-              >{`Price in USD = ${item?.price_usd}`}</Text>
-              <Button labelText={"Close"} onPress={handleClose} />
-            </View>
-          </View>
-        </Modal>
-        <Pressable onPress={() => setModalVisible(true)}>
-          <ItemCard
-            title={item?.name}
-            assetId={item?.asset_id}
-            image={image?.url}
-          />
-        </Pressable>
-      </View>
+      <>
+        <PopUpModalCard item={item} image={image}>
+          <Text style={styles.modalText}>{item?.name}</Text>
+          <Text style={styles.modalText}>{`Price in USD = ${getPrice(
+            Number(item?.price_usd)
+          )}`}</Text>
+        </PopUpModalCard>
+      </>
     );
   };
   return (
